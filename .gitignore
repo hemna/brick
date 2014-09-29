@@ -1,0 +1,11 @@
+.coverage
+.venv
+.tox
+.testrepository
+doc/build
+build
+dist
+*.pyc
+
+.project
+.pydevproject
