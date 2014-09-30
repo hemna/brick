@@ -1,7 +1,9 @@
 import brick
 
-from setuptools import setup, find_packages
-import sys, os
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+    from distutils.core import setup, find_packages
 
 setup(name='brick',
       version=brick.version,
