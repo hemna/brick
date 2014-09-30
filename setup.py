@@ -28,7 +28,8 @@ Add description""",
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          # -*- Extra requirements: -*-
+          'oslo.i18n',
+          'oslo.serialization',
       ],
       entry_points="""
       # -*- Entry points: -*-

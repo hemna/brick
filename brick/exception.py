@@ -14,25 +14,11 @@
 
 """Exceptions for the Brick library."""
 
-import sys
-
-from oslo.config import cfg
-import six
-
 from brick.i18n import _
 from brick.openstack.common import log as logging
 
 
 LOG = logging.getLogger(__name__)
-
-exc_log_opts = [
-    cfg.BoolOpt('fatal_exception_format_errors',
-                default=False,
-                help='Make exception message format errors fatal.'),
-]
-
-CONF = cfg.CONF
-CONF.register_opts(exc_log_opts)
 
 
 class BrickException(Exception):
@@ -56,27 +42,21 @@ class BrickException(Exception):
             except AttributeError:
                 pass
 
-        for k, v in self.kwargs.iteritems():
-            if isinstance(v, Exception):
-                self.kwargs[k] = six.text_type(v)
-
         if not message:
             try:
                 message = self.message % kwargs
 
             except Exception:
-                exc_info = sys.exc_info()
                 # kwargs doesn't match a variable in the message
                 # log the issue and the kwargs
-                LOG.exception(_("Exception in string format operation."))
+                msg = (_("Exception in string format operation.  msg='%s'")
+                       % self.message)
+                LOG.exception(msg)
                 for name, value in kwargs.iteritems():
                     LOG.error("%s: %s" % (name, value))
-                if CONF.fatal_exception_format_errors:
-                    raise exc_info[0], exc_info[1], exc_info[2]
+
                 # at least get the core message out if something happened
                 message = self.message
-        elif isinstance(message, Exception):
-            message = six.text_type(message)
 
         # Put the message in 'msg' so that we can access it.  If we have it in
         # message it will be overshadowed by the class' message attribute
@@ -85,15 +65,6 @@ class BrickException(Exception):
 
     def __unicode__(self):
         return unicode(self.msg)
-
-
-class NotAuthorized(BrickException):
-    message = _("Not authorized.")
-    code = 403
-
-
-class AdminRequired(NotAuthorized):
-    message = _("User does not have admin privileges")
 
 
 class NotFound(BrickException):
@@ -107,22 +78,10 @@ class Invalid(BrickException):
     code = 400
 
 
-class InvalidContentType(Invalid):
-    message = _("Invalid content type %(content_type)s")
-
-
 # Cannot be templated as the error syntax varies.
 # msg needs to be constructed when raised.
 class InvalidParameterValue(Invalid):
     message = _("%(err)s")
-
-
-class PasteAppNotFound(NotFound):
-    message = _("Could not load paste app '%(name)s' from %(path)s")
-
-
-class ConfigNotFound(NotFound):
-        message = _("Could not find config at %(path)s")
 
 
 class NoFibreChannelHostsFound(BrickException):
