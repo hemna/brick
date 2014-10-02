@@ -35,13 +35,15 @@ synchronized = lockutils.synchronized_with_prefix('brick-')
 DEVICE_SCAN_ATTEMPTS_DEFAULT = 3
 
 
-def get_connector_properties(root_helper, my_ip):
+def get_connector_properties(root_helper, my_ip=None):
     """Get the connection properties for all protocols."""
 
     iscsi = ISCSIConnector(root_helper=root_helper)
     fc = linuxfc.LinuxFibreChannel(root_helper=root_helper)
 
     props = {}
+    if not my_ip:
+        my_ip = get_local_ip()
     props['ip'] = my_ip
     props['host'] = socket.gethostname()
     initiator = iscsi.get_initiator()
@@ -55,6 +57,14 @@ def get_connector_properties(root_helper, my_ip):
         props['wwnns'] = wwnns
 
     return props
+
+
+def get_local_ip():
+    """Get a local ip adress via udp broadcast."""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    sock.connect(('<broadcast>', 0))
+    return sock.getsockname()[0]
 
 
 class InitiatorConnector(executor.Executor):
