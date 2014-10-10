@@ -1,5 +1,7 @@
+coverage
 nose
 nose-testconfig
 flask
 flake8
-mock
+mock>=1.0
+fixtures>=0.3.14
