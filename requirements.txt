@@ -3,3 +3,4 @@ oslo.i18n
 oslo.serialization
 oslo.config
 eventlet
+oslo.utils
