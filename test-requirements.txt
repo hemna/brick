@@ -5,3 +5,4 @@ flask
 flake8
 mock>=1.0
 fixtures>=0.3.14
+sphinx
